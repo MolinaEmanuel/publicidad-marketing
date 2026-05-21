@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Publicidad Marketing</title>
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="icon" href="assets/images/logo-dutty.png" type="image/png">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+
+  <!-- LOADER -->
+<div id="loader-overlay">
+  <div class="loader-logo">Publicidad Marketing</div>
+  <div class="loader-spinner"></div>
+</div>
+
+<div class="app-layout">
+
+  <!-- SIDEBAR IZQUIERDA -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">Publicidad Marketing</div>
+    <button class="sidebar-nav-item activo" id="side-dashboard" onclick="mostrarSeccion('dashboard')">
+      <i class="fa-solid fa-house"></i><span>Inicio</span>
+    </button>
+    <button class="sidebar-nav-item" id="side-buscar" >
+      <i class="fa-solid fa-magnifying-glass"></i><span>Buscar</span>
+    </button>
+    <button class="sidebar-nav-item" id="side-empresas" onclick="mostrarSeccion('empresas')">
+      <i class="fa-solid fa-building"></i><span>Empresas</span>
+    </button>
+    <button class="sidebar-nav-item" id="side-facturas" onclick="mostrarSeccion('facturas')">
+      <i class="fa-solid fa-file-invoice"></i><span>Facturas</span>
+    </button>
+    <button class="sidebar-nav-item" id="side-contratos" onclick="mostrarSeccion('contratos')">
+      <i class="fa-solid fa-file-contract"></i><span>Contratos</span>
+    </button>
+    <button class="sidebar-nav-item" id="side-historial" onclick="mostrarSeccion('historial')">
+      <i class="fa-solid fa-clock-rotate-left"></i><span>Historial</span>
+    </button>
+    <button class="sidebar-nav-item" id="side-estadisticas" onclick="mostrarSeccion('estadisticas')">
+      <i class="fa-solid fa-chart-bar"></i><span>Estadísticas</span>
+    </button>
+    <div class="sidebar-spacer"></div>
+    <button class="sidebar-nav-item" id="btn-tema">
+      <i class="fa-solid fa-moon"></i><span>Tema</span>
+    </button>
+    <button class="sidebar-nav-item" id="btn-admin">
+      <i class="fa-solid fa-lock"></i><span>Admin</span>
+    </button>
+  </aside>
+
+  <!-- COLUMNA CENTRAL -->
+  <main class="main-content">
+
+    <!-- BÚSQUEDA -->
+    <div id="barra-busqueda" class="barra-busqueda oculto">
+      <input type="text" id="input-busqueda" placeholder="Buscar empresas, facturas, contratos..." />
+      <button id="btn-cerrar-busqueda"><i class="fa-solid fa-x"></i></button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section id="seccion-dashboard" class="seccion activa">
+      <div class="stories-wrap" id="stories-wrap"></div>
+      <div id="dash-alertas"></div>
+      <div class="feed" id="feed-dashboard"></div>
+    </section>
+
+    <!-- EMPRESAS -->
+    <section id="seccion-empresas" class="seccion">
+      <div class="seccion-header">
+        <h2>Empresas</h2>
+        <button id="btn-nueva-empresa" class="btn-agregar oculto">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+      <div id="form-empresa" class="form-card oculto">
+        <h3 id="form-empresa-titulo">Nueva Empresa</h3>
+        <input type="text" id="emp-nombre" placeholder="Nombre de la empresa" />
+        <input type="text" id="emp-cuit" placeholder="CUIT / RUT" />
+        <input type="email" id="emp-email" placeholder="Email de contacto" />
+        <input type="text" id="emp-telefono" placeholder="Teléfono" />
+        <select id="emp-estado">
+          <option value="al-dia">Al día</option>
+          <option value="pendiente">Deuda pendiente</option>
+        </select>
+        <textarea id="emp-notas" placeholder="Notas (opcional)" rows="3"></textarea>
+        <div class="form-botones">
+          <button onclick="guardarEmpresa()">Guardar</button>
+          <button onclick="cancelarFormEmpresa()">Cancelar</button>
+        </div>
+      </div>
+      <div id="lista-empresas"></div>
+    </section>
+
+    <!-- FACTURAS -->
+    <section id="seccion-facturas" class="seccion">
+      <div class="seccion-header">
+        <h2>Facturas</h2>
+        <button id="btn-nueva-factura" class="btn-agregar oculto">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+      <div class="filtro-bar">
+        <select id="filtro-empresa-factura"><option value="">Todas las empresas</option></select>
+        <select id="filtro-estado-factura">
+          <option value="">Todos los estados</option>
+          <option value="pendiente">Pendiente</option>
+          <option value="pagada">Pagada</option>
+          <option value="vencida">Vencida</option>
+          <option value="anulada">Anulada</option>
+        </select>
+      </div>
+      <div id="form-factura" class="form-card oculto">
+        <h3 id="form-factura-titulo">Nueva Factura</h3>
+        <select id="fac-empresa"><option value="">Seleccioná una empresa</option></select>
+        <input type="text" id="fac-numero" placeholder="Número de factura" />
+        <input type="date" id="fac-emision" />
+        <input type="date" id="fac-vencimiento" />
+        <input type="number" id="fac-monto" placeholder="Monto" step="0.01" />
+        <select id="fac-estado">
+          <option value="pendiente">Pendiente de pago</option>
+          <option value="pagada">Pagada</option>
+          <option value="vencida">Vencida</option>
+          <option value="anulada">Anulada</option>
+        </select>
+        <input type="text" id="fac-imputacion" placeholder="Imputación contable" />
+        <textarea id="fac-notas" placeholder="Observaciones (opcional)" rows="3"></textarea>
+        <div class="input-archivo">
+          <label>📎 Adjuntar PDF de la factura</label>
+          <input type="file" id="fac-pdf" accept="application/pdf" />
+        </div>
+        <div id="fac-pdf-actual" class="pdf-actual oculto"></div>
+        <div class="form-botones">
+          <button onclick="guardarFactura()">Guardar</button>
+          <button onclick="cancelarFormFactura()">Cancelar</button>
+        </div>
+      </div>
+      <div id="lista-facturas"></div>
+    </section>
+
+    <!-- CONTRATOS -->
+    <section id="seccion-contratos" class="seccion">
+      <div class="seccion-header">
+        <h2>Contratos</h2>
+        <button id="btn-nuevo-contrato" class="btn-agregar oculto">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+      <div id="alertas-contratos"></div>
+      <div class="filtro-bar">
+        <select id="filtro-empresa-contrato"><option value="">Todas las empresas</option></select>
+        <select id="filtro-estado-contrato">
+          <option value="">Todos los estados</option>
+          <option value="vigente">Vigente</option>
+          <option value="por-vencer">Por vencer</option>
+          <option value="vencido">Vencido</option>
+        </select>
+      </div>
+      <div id="form-contrato" class="form-card oculto">
+        <h3 id="form-contrato-titulo">Nuevo Contrato</h3>
+        <select id="con-empresa"><option value="">Seleccioná una empresa</option></select>
+        <input type="text" id="con-nombre" placeholder="Nombre del contrato" />
+        <input type="text" id="con-tipo" placeholder="Tipo de servicio" />
+        <input type="date" id="con-inicio" />
+        <input type="date" id="con-vencimiento" />
+        <input type="number" id="con-monto" placeholder="Monto / valor del contrato" step="0.01" />
+        <textarea id="con-notas" placeholder="Observaciones (opcional)" rows="3"></textarea>
+        <div class="input-archivo">
+          <label>📎 Adjuntar PDF del contrato</label>
+          <input type="file" id="con-pdf" accept="application/pdf" />
+        </div>
+        <div id="con-pdf-actual" class="pdf-actual oculto"></div>
+        <div class="form-botones">
+          <button onclick="guardarContrato()">Guardar</button>
+          <button onclick="cancelarFormContrato()">Cancelar</button>
+        </div>
+      </div>
+      <div id="lista-contratos"></div>
+    </section>
+
+    <!-- HISTORIAL -->
+    <section id="seccion-historial" class="seccion">
+      <div class="seccion-header">
+        <h2>Historial</h2>
+        <button onclick="limpiarHistorial()" id="btn-limpiar-historial" class="btn-limpiar oculto">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+      <div class="filtro-bar">
+        <select id="filtro-historial-tipo">
+          <option value="">Todos los tipos</option>
+          <option value="factura">Facturas</option>
+          <option value="contrato">Contratos</option>
+          <option value="empresa">Empresas</option>
+        </select>
+        <select id="filtro-historial-accion">
+          <option value="">Todas las acciones</option>
+          <option value="creó">Creación</option>
+          <option value="editó">Edición</option>
+          <option value="eliminó">Eliminación</option>
+        </select>
+      </div>
+      <div id="lista-historial"></div>
+    </section>
+
+    <!-- ESTADÍSTICAS -->
+    <section id="seccion-estadisticas" class="seccion">
+      <div class="seccion-header">
+        <h2>Estadísticas</h2>
+        <button onclick="exportarExcel()" class="btn-exportar">
+          <i class="fa-solid fa-file-excel"></i> Exportar
+        </button>
+      </div>
+      <div class="stat-bloque">
+        <h3 class="stat-titulo">Estado de facturas</h3>
+        <canvas id="grafico-estados"></canvas>
+      </div>
+      <div class="stat-bloque">
+        <h3 class="stat-titulo">Monto pendiente por empresa</h3>
+        <canvas id="grafico-empresas"></canvas>
+      </div>
+      <div class="stat-bloque">
+        <h3 class="stat-titulo">Pagos por mes</h3>
+        <canvas id="grafico-meses"></canvas>
+      </div>
+    </section>
+
+    <!-- BÚSQUEDA -->
+    <section id="seccion-busqueda" class="seccion">
+      <div id="resultados-busqueda"></div>
+    </section>
+
+  </main>
+
+  <!-- PANEL DERECHO -->
+  <aside class="right-panel" id="right-panel">
+    <div class="right-panel-title">Resumen</div>
+    <div class="right-stat">
+      <div class="right-stat-label">Total pendiente</div>
+      <div class="right-stat-val" id="dash-total-pendiente">$ 0</div>
+    </div>
+    <div class="right-stat">
+      <div class="right-stat-label">Facturas pendientes</div>
+      <div class="right-stat-val" id="dash-facturas-pendientes">0</div>
+    </div>
+    <div class="right-stat">
+      <div class="right-stat-label">Contratos por vencer</div>
+      <div class="right-stat-val" id="dash-contratos-vencer">0</div>
+    </div>
+    <div class="right-panel-title">Alertas</div>
+    <div id="right-alertas"></div>
+    <div class="right-panel-title">Empresas</div>
+    <div id="right-empresas"></div>
+  </aside>
+
+</div>
+
+<!-- BOTTOM NAV (solo mobile) -->
+<nav class="bottom-nav">
+  <button onclick="mostrarSeccion('dashboard')" class="nav-btn activo" id="nav-dashboard">
+    <i class="fa-solid fa-house"></i><span>Inicio</span>
+  </button>
+  <button onclick="mostrarSeccion('empresas')" class="nav-btn" id="nav-empresas">
+    <i class="fa-solid fa-building"></i><span>Empresas</span>
+  </button>
+  <button onclick="mostrarSeccion('facturas')" class="nav-btn" id="nav-facturas">
+    <i class="fa-solid fa-file-invoice"></i><span>Facturas</span>
+  </button>
+  <button onclick="mostrarSeccion('contratos')" class="nav-btn" id="nav-contratos">
+    <i class="fa-solid fa-file-contract"></i><span>Contratos</span>
+  </button>
+  <button onclick="mostrarSeccion('estadisticas')" class="nav-btn" id="nav-estadisticas">
+    <i class="fa-solid fa-chart-bar"></i><span>Stats</span>
+  </button>
+</nav>
+
+<!-- MODAL ADMIN -->
+<div id="modal-admin" class="modal oculto">
+  <div class="modal-contenido">
+    <h3>🔒 Modo Admin</h3>
+    <p>Ingresá la contraseña para editar</p>
+    <input type="password" id="input-password" placeholder="Contraseña" />
+    <div class="modal-botones">
+      <button onclick="verificarPassword()">Entrar</button>
+      <button onclick="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
